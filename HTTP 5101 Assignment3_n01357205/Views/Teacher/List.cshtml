@@ -1,17 +1,25 @@
 ﻿@model IEnumerable<HTTP_5101_Assignment3_n01357205.Models.Teacher>
 @{
-    ViewBag.Title = "Teacher's List";
+    ViewBag.Title = "List Of Teachers";
 }
 
-<h2>Teacher's List</h2>
-
-@foreach(var teacher in Model)
+<h2>List Of Teachers</h2>
+<nav>
+    <a class="navlink" href="/Teacher/Add">Want to add a<span id="TeacherSpan"> NEW TEACHER</span> ? Click Here.</a>
+</nav>
+<form action="/Teacher/List" method="GET">
+    <input type="text" name="SearchKey" />
+    <input type="submit" value="Search" />
+</form>
+<div class="resultsfound">
+    @Model.Count() result(s) found
+</div>
+@foreach (var teacher in Model)
 {
-    <div class="teacherList">
-        <p>Teacher name : @teacher.teacherFname @teacher.teacherLname</p>
-        <p>Teacher employeenumber : @teacher.employeeNumber</p>
-        <p>Teacher Hire date : @teacher.hireDate</p>
-        <p>Teacher Salary : @teacher.teacherSalary</p>
+    <div class="list-group-item row">
+        <div class="col-md-12">
+            <a href="/Teacher/Show/@teacher.TeacherId">@teacher.TeacherFname @teacher.TeacherLname</a>
+        </div>
     </div>
 }
 

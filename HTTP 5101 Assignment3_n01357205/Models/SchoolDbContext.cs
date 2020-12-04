@@ -25,7 +25,8 @@ namespace HTTP_5101_Assignment3_n01357205.Models
                     + "; user = " + User
                     + "; database = " + Database
                     + "; port = " + Port
-                    + "; password = " + Password;
+                    + "; password = " + Password
+                    + "; convert zero datetime = True"; //DateTime cast will work with this setting
             }
         }
         /// <summary>

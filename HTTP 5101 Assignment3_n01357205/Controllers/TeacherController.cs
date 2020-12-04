@@ -4,30 +4,18 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using HTTP_5101_Assignment3_n01357205.Models;
+using System.Diagnostics;
 
 namespace HTTP_5101_Assignment3_n01357205.Controllers
 {
     public class TeacherController : Controller
     {
+
         // GET: Teacher
         // GET: Teacher/Index
         public ActionResult Index()
         {
             return View();
-        }
-
-        /// <summary>
-        /// Function to find a teachers details based on 2 parameters - firstname , salary
-        /// </summary>
-        /// <example>GET api/Teacher/Search/{firstname}/{salary}</example>
-        /// <param name="fname">FirstName of Teacher</param>
-        /// <param name="salary">Salary of Teacher</param>
-        /// <returns>Teacher Object</returns>
-        public ActionResult Search(string fname, string salary)
-        {
-            TeacherDataController controller = new TeacherDataController();
-            Teacher NewTeacher = controller.SearchTeacher(fname, salary);
-            return View("Show", NewTeacher);
         }
 
         /// <summary>
@@ -37,11 +25,11 @@ namespace HTTP_5101_Assignment3_n01357205.Controllers
         /// <returns>
         /// A list of Teachers
         /// </returns>
-        //GET : /Teacher/List
-        public ActionResult List()
+        //GET : /Teacher/List/{}
+        public ActionResult List(string SearchKey = null)
         {
             TeacherDataController controller = new TeacherDataController();
-            IEnumerable<Teacher> Teachers = controller.ListTeachers();
+            IEnumerable<Teacher> Teachers = controller.ListTeachers(SearchKey);
             return View(Teachers);
         }
 
@@ -57,5 +45,46 @@ namespace HTTP_5101_Assignment3_n01357205.Controllers
             Teacher NewTeacher = controller.FindTeacher(id);
             return View(NewTeacher);
         }
+
+        //GET : /Teacher/DeleteConfirm/{id}
+        public ActionResult DeleteConfirm(int id)
+        {
+            TeacherDataController controller = new TeacherDataController();
+            Teacher NewTeacher = controller.FindTeacher(id);
+
+            return View(NewTeacher);
+        }
+
+        //POST :/Teacher/Delete/{id}
+        public ActionResult Delete(int id)
+        {
+            TeacherDataController controller = new TeacherDataController();
+            controller.DeleteTeacher(id);
+            return RedirectToAction("List");
+        }
+
+
+        //GET: /Teacher/New
+        public ActionResult Add()
+        {
+            return View();
+        }
+
+        //POST: /Author/Create
+        [HttpPost]
+        public ActionResult Create(string TeacherFname, string TeacherLname, string EmployeeNumber, double Salary)
+        {
+            Teacher NewTeacher = new Teacher();
+
+            NewTeacher.TeacherFname = TeacherFname;
+            NewTeacher.TeacherLname = TeacherLname;
+            NewTeacher.EmployeeNumber = EmployeeNumber;
+            NewTeacher.Salary = Salary;
+            NewTeacher.HireDate = DateTime.Today;
+            TeacherDataController controller = new TeacherDataController();
+            controller.CreateTeacher(NewTeacher);
+            return RedirectToAction("List");
+        }
+
     }
 }
