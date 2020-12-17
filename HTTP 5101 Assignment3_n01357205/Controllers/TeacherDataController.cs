@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using HTTP_5101_Assignment3_n01357205.Models;
 using MySql.Data.MySqlClient ;
+using System.Diagnostics;
 
 namespace HTTP_5101_Assignment3_n01357205.Controllers
 {
@@ -85,37 +86,58 @@ namespace HTTP_5101_Assignment3_n01357205.Controllers
         {
             Teacher NewTeacher = new Teacher();
 
-            //Create an instance of a connection
-            MySqlConnection Conn = School.AccessDatabase();
-
-            //Open the connection between the web server and database
-            Conn.Open();
-
-            //Establish a new command (query) for our database
-            MySqlCommand cmd = Conn.CreateCommand();
-
-            //SQL QUERY
-            cmd.CommandText = "Select * from Teachers where teacherid = @key";
-
-            //Preventing SQL Injection Attack
-            cmd.Parameters.AddWithValue("@key", id);
-            cmd.Prepare();
-
-            //Gather Result Set of Query into a variable
-            MySqlDataReader ResultSet = cmd.ExecuteReader();
-
-            //Loop Through Each Row the Result Set
-            while (ResultSet.Read())
+            try
             {
-                //Access Column information by the DB column name as an index
 
-                NewTeacher.TeacherId = Convert.ToInt32(ResultSet["teacherid"]);
-                NewTeacher.TeacherFname = ResultSet["teacherfname"].ToString();
-                NewTeacher.TeacherLname = ResultSet["teacherlname"].ToString();
-                NewTeacher.EmployeeNumber = ResultSet["employeenumber"].ToString();
-                NewTeacher.HireDate = Convert.ToDateTime(ResultSet["hiredate"]);
-                NewTeacher.Salary = Convert.ToDouble(ResultSet["salary"]);
+                //Create an instance of a connection
+                MySqlConnection Conn = School.AccessDatabase();
+
+                //Open the connection between the web server and database
+                Conn.Open();
+
+                //Establish a new command (query) for our database
+                MySqlCommand cmd = Conn.CreateCommand();
+
+                //SQL QUERY
+                cmd.CommandText = "Select * from Teachers where teacherid = @key";
+
+                //Preventing SQL Injection Attack
+                cmd.Parameters.AddWithValue("@key", id);
+                cmd.Prepare();
+
+                //Gather Result Set of Query into a variable
+                MySqlDataReader ResultSet = cmd.ExecuteReader();
+
+                //Loop Through Each Row the Result Set
+                while (ResultSet.Read())
+                {
+                    //Access Column information by the DB column name as an index
+
+                    NewTeacher.TeacherId = Convert.ToInt32(ResultSet["teacherid"]);
+                    NewTeacher.TeacherFname = ResultSet["teacherfname"].ToString();
+                    NewTeacher.TeacherLname = ResultSet["teacherlname"].ToString();
+                    NewTeacher.EmployeeNumber = ResultSet["employeenumber"].ToString();
+                    NewTeacher.HireDate = Convert.ToDateTime(ResultSet["hiredate"]);
+                    NewTeacher.Salary = Convert.ToDouble(ResultSet["salary"]);
+                }
+
+                if (!NewTeacher.IsValid())
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
             }
+            catch(HttpResponseException ex)
+            {
+                Debug.WriteLine(ex);
+                throw new ApplicationException("That teacher was not found.", ex);
+            }
+            catch (Exception ex)
+            {
+                //Catches generic issues
+                Debug.Write(ex);
+                throw new ApplicationException("There was a server issue.", ex);
+            }
+
             return NewTeacher;
         }
 
@@ -186,6 +208,52 @@ namespace HTTP_5101_Assignment3_n01357205.Controllers
             cmd.Parameters.AddWithValue("@EmployeeNumber", NewTeacher.EmployeeNumber);
             cmd.Parameters.AddWithValue("@HireDate", NewTeacher.HireDate);
             cmd.Parameters.AddWithValue("@Salary", NewTeacher.Salary);
+            cmd.Prepare();
+
+            //Gather Result Set of Query into a variable
+            cmd.ExecuteReader();
+
+            Conn.Close();
+        }
+
+        /// <summary>
+        /// Function to Update the details of a Teacher 
+        /// </summary>
+        /// <param name="Id">Id of the teacher to be updated</param>
+        /// <param name="UpdatedTeacherInfo">An object with fields that map to the columns of the teacher's table.
+        /// </param>
+        /// <example>POST : api/TeacherData/UpdateTeacher/10
+        /// FORM DATA / POST DATA / REQUEST BODY 
+        /// {
+        ///	"TeacherFname":"Jerrin",
+        ///	"TeacherLname":"Eldo",
+        ///	"TeacherEmployeeNumber":"T254",
+        ///	"TeacherSalary": 75
+        /// }
+        /// </example>
+        /// <returns>Does not return anything.</returns>
+        [HttpPost]
+        public void UpdateTeacher(int Id, [FromBody] Teacher UpdatedTeacherInfo)
+        {
+            //Create an instance of a connection
+            MySqlConnection Conn = School.AccessDatabase();
+
+            //Open the connection between the web server and database
+            Conn.Open();
+
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
+
+            //SQL QUERY
+            cmd.CommandText = "Update teachers SET teacherfname = @TeacherFname , teacherlname = @TeacherLname ," +
+                "employeenumber = @EmployeeNumber , salary = @Salary where teacherid = @teacherid ";
+
+            //Preventing SQL Injection Attack
+            cmd.Parameters.AddWithValue("@TeacherFname", UpdatedTeacherInfo.TeacherFname);
+            cmd.Parameters.AddWithValue("@TeacherLname", UpdatedTeacherInfo.TeacherLname);
+            cmd.Parameters.AddWithValue("@EmployeeNumber", UpdatedTeacherInfo.EmployeeNumber);
+            cmd.Parameters.AddWithValue("@teacherid",Id);
+            cmd.Parameters.AddWithValue("@Salary", UpdatedTeacherInfo.Salary);
             cmd.Prepare();
 
             //Gather Result Set of Query into a variable

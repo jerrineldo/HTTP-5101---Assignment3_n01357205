@@ -14,6 +14,11 @@ input,
 select,
 textarea {
     max-width: 280px;
+   
+}
+#container-update input {
+    float: right;
+    border: 1px solid black;
 }
 nav {
     overflow: hidden;
@@ -21,16 +26,23 @@ nav {
 }
 .navlink {
     float: left;
+    margin-right :1em;
 }
 .dellink {
     float: right;
     color: red;
 }
-#containerlist, #containershow {
-    width: 80%;
-    margin: 0 auto;
+
+#container-update {
     margin-top: 80px;
+    height: 20em;
+    width: 30%;
+    margin-left: 2em;
 }
+.heading-left {
+    margin-bottom: 1em;
+}
+
 .resultsfound {
     font-style: italic;
     margin: 10px 0;
@@ -38,7 +50,7 @@ nav {
 #TeacherSpan{
     color:red;
 }
-#containerlist, #containershow {
+#containerlist {
     width: 80%;
     margin: 0 auto;
     margin-top: 80px;
@@ -51,7 +63,17 @@ nav {
     color: white;
     border: 2px solid #000
 }
+.items{
+    height:40px;
+}
 
 .listitem {
     margin: 10px 0;
+}
+input:focus {
+    outline: none;
+}
+
+.left-button {
+    float: left !important;
 }
